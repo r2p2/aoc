@@ -64,7 +64,7 @@ func Part2(input string) string {
 
 func shortcuts(path path, allowedDistance int) (shortcuts int) {
 	// FIXME: Could this be optimized?
-	for i := 0; i < len(path); i++ {
+	for i := 0; i < len(path)-1; i++ {
 		for j := i; j < len(path); j++ {
 			a := path[i]
 			b := path[j]
@@ -74,12 +74,12 @@ func shortcuts(path path, allowedDistance int) (shortcuts int) {
 			}
 
 			distance := delta.x + delta.y
-			if distance < 2 || distance > allowedDistance {
+			if distance > allowedDistance {
 				continue
 			}
 
-			newPathLength := len(path) - (j - i) + distance
-			if newPathLength > len(path)-100 {
+			newPathLength := j - i - distance
+			if newPathLength < 100 {
 				continue
 			}
 
@@ -159,14 +159,16 @@ func (a *Area) path(src, dst pos, ignore pos) path {
 	}
 	visited := map[pos]bool{}
 	visited[src] = true
-	queue := []Node{{pos: src, path: []pos{src}}}
+	queue := make([]Node, 0, 1024)
+	queue = append(queue, Node{pos: src, path: make([]pos, 0, 1024)})
+	queue[0].path = append(queue[0].path, src)
 	for len(queue) > 0 {
 		var node Node
 		node, queue = queue[0], queue[1:]
 
 		if node.pos == dst {
 			pathsToTarget = append(pathsToTarget, node.path)
-			continue
+			break
 		}
 		for _, dir := range []pos{{-1, 0}, {1, 0}, {0, -1}, {0, 1}} {
 			next := pos{
@@ -190,7 +192,7 @@ func (a *Area) path(src, dst pos, ignore pos) path {
 
 			visited[next] = true
 
-			newPath := make([]pos, len(node.path))
+			newPath := make([]pos, len(node.path), len(node.path)*2)
 			copy(newPath, node.path)
 			newPath = append(newPath, next)
 

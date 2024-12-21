@@ -17,7 +17,10 @@ import (
 	"aoc/y24/d20"
 	"flag"
 	"fmt"
+	"log"
 	"os"
+	"runtime"
+	"runtime/pprof"
 	"strings"
 	"time"
 )
@@ -79,11 +82,42 @@ func loadInput(year, day int) (string, error) {
 }
 
 func main() {
+	profcpu := flag.String("profcpu", "", "profile cpu")
+	profmem := flag.String("profmem", "", "profile memory")
 	year := flag.Int("year", 0, "year or 0")
 	day := flag.Int("day", 0, "day or 0")
 	part := flag.Int("part", 0, "part or 0")
 	inputFile := flag.String("input", "", "alternative input file (requires year and date)")
 	flag.Parse()
+
+	if *profcpu != "" {
+		f, err := os.Create(*profcpu)
+		if err != nil {
+			log.Fatal("could not create cpu profile: ", err)
+		}
+
+		defer f.Close()
+
+		if err := pprof.StartCPUProfile(f); err != nil {
+			log.Fatal("could not start cpu profiling: ", err)
+		}
+		defer pprof.StopCPUProfile()
+	}
+
+	if *profmem != "" {
+		f, err := os.Create(*profmem)
+		if err != nil {
+			log.Fatal("could not create mem profile: ", err)
+		}
+
+		defer f.Close()
+
+		runtime.GC()
+
+		if err := pprof.WriteHeapProfile(f); err != nil {
+			log.Fatal("could not write mem profile: ", err)
+		}
+	}
 
 	if len(*inputFile) > 0 && *year == 0 {
 		fmt.Println("if input ist provdied, year is required")
