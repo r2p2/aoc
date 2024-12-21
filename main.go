@@ -15,6 +15,8 @@ import (
 	"aoc/y24/d18"
 	"aoc/y24/d19"
 	"aoc/y24/d20"
+	"aoc/y24/d21"
+	"aoc/y24/d22"
 	"flag"
 	"fmt"
 	"log"
@@ -40,6 +42,8 @@ var challenges = []Challenge{
 	{24, 18, d18.Part1, d18.Part2},
 	{24, 19, d19.Part1, d19.Part2},
 	{24, 20, d20.Part1, d20.Part2},
+	{24, 21, d21.Part1, d21.Part2},
+	{24, 22, d22.Part1, d22.Part2},
 }
 
 type Challenge struct {
